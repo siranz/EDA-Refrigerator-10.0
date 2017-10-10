@@ -1,0 +1,47 @@
+---
+title: "EDA Refrigerator"
+author: "Siran Zhao"
+date: "October 9, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('dplyr')
+library('tidyverse')
+```
+```{r}
+df<-read.csv('E:/BU/MA 615 R/EDA Project-refrigerator/size&household members.csv')
+as.tibble(df)
+df <- rename(df, size=X, '1'=X1.member, '2'=X2.members, '3'=X3.members, '4'=X4.members, '5 or more'=X5.or.more.members )
+df.tidy <- df %>%
+  gather(`1`,`2`, `3`, `4`, `5 or more`, key = "household member", value = "number of regfrigerator")
+df.tidy
+```
+
+```{r}
+typmen <- read.csv("E:/BU/MA 615 R/EDA Project-refrigerator/type.csv")
+typmen <- rename(typmen,type=X,'1'=X1.member,'2'=X2.members,'3'=X3.members,'4'=X4.members, '5 or more'=X5.or.more.members)# rename the variable of the refrigerator types
+typmen.tidy <-typmen %>%
+  gather('1','2','3','4','5 or more', key="member", value= "household")#tidy the data
+typmen.tidy$Total.U.S.2<-NULL #drop the column of useless data
+typmen.tidy[typmen.tidy== 'Q']<-0 # change the not significant data into 0
+typmen.tidy[typmen.tidy== 'N']<-0 # change the NA data into 0
+typmen.tidy[,1] <- sapply(typmen.tidy[,1],as.factor) # transform type into factor
+typmen.tidy[,2] <- sapply(typmen.tidy[,2],as.factor) # transform type into factor
+typmen.tidy[,3] <- sapply(typmen.tidy[,3],as.numeric) # transform type into nymeric
+ggplot()+
+  geom_bar(aes(x=type,y=household,fill=member),data=typmen.tidy,stat='identity')+
+  coord_flip()+
+  labs(fill = 'nm')
+  #plot the bar plot of data
+
+```
+```{r}
+ggplot(data=typmen.tidy)+
+  geom_bar(mapping=aes(x=type,y=household,fill=member),stat = "identity",position = "dodge")+
+  coord_flip()+
+  labs(fill = 'nm')
+  #split the barplot into different kinds
+
+```
